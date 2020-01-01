@@ -11,4 +11,6 @@ int GPIO_SetPinAsInput  (uint8_t pin);
 int GPIO_SetPin         (uint8_t pin);
 int GPIO_ClearPin       (uint8_t pin);
 
+void GPIO_Init (void);
+
 #endif //GPIO_H

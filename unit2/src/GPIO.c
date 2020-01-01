@@ -40,3 +40,10 @@ int GPIO_ClearPin (uint8_t pin)
 {
     return GPIO_FAIL;
 }
+
+void GPIO_Init (void)
+{
+    PORTC.PDDR = 0x1012A000;
+    PORTC.PSOR = 0x10102000;
+    PORTC.PCOR = 0x00028000;
+}

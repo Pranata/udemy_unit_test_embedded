@@ -85,6 +85,19 @@ void test_SetPin_should_NotSetOutputs_when_PinIsNotValid(void)
     TEST_ASSERT_EQUAL_HEX32(0, PORTC.PDDR);
 }
 
+void test_Init_should_ConfigurePinsToDefaults(void)
+{
+    PORTC.PDDR = 0;
+    PORTC.PSOR = 0;
+    PORTC.PCOR = 0;
+
+    GPIO_Init();
+
+    TEST_ASSERT_EQUAL_HEX32(0x1012A000, PORTC.PDDR);
+    TEST_ASSERT_EQUAL_HEX32(0x10102000, PORTC.PSOR);
+    TEST_ASSERT_EQUAL_HEX32(0x00028000, PORTC.PCOR);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_SetPinAsOutput_should_ConfigurePinDirection);
@@ -94,5 +107,6 @@ int main(void) {
     RUN_TEST(test_SetPin_should_SetOutputHigh);
     RUN_TEST(test_SetPin_should_ForceToOutput_when_ConfiguredAsInput);
     RUN_TEST(test_SetPin_should_NotSetOutputs_when_PinIsNotValid);
+    RUN_TEST(test_Init_should_ConfigurePinsToDefaults);
     return UNITY_END();
 }
