@@ -3,6 +3,16 @@
 #include "GPIO.h"
 #include "MK20DX256.h"
 
+void setUp(void)
+{
+    GPIO_Init();
+}
+
+void tearDown(void)
+{
+    ;
+}
+
 void test_SetPinAsOutput_should_ConfigurePinDirection(void)
 {
     PORTC.PDDR = 0;
@@ -98,6 +108,26 @@ void test_Init_should_ConfigurePinsToDefaults(void)
     TEST_ASSERT_EQUAL_HEX32(0x00028000, PORTC.PCOR);
 }
 
+void test_SetPin_should_HandleReversedPin(void)
+{
+    PORTC.PSOR = 0;
+    PORTC.PCOR = 0;
+
+    GPIO_SetPin(1);
+
+    TEST_ASSERT_EQUAL(BIT_TO_MASK(1), PORTC.PCOR);
+    TEST_ASSERT_EQUAL(0, PORTC.PSOR);
+}
+
+void test_ReadPort_should_ShowProperlyReversedPolarities(void)
+{
+    PORTC.PDIR = 0;
+    TEST_ASSERT_EQUAL_HEX32(0x00000022, GPIO_ReadPort());
+
+    PORTC.PDIR = 0xFFFFFFFF;
+    TEST_ASSERT_EQUAL_HEX32(0xFFFFFFDD, GPIO_ReadPort());
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_SetPinAsOutput_should_ConfigurePinDirection);
@@ -108,5 +138,7 @@ int main(void) {
     RUN_TEST(test_SetPin_should_ForceToOutput_when_ConfiguredAsInput);
     RUN_TEST(test_SetPin_should_NotSetOutputs_when_PinIsNotValid);
     RUN_TEST(test_Init_should_ConfigurePinsToDefaults);
+    RUN_TEST(test_SetPin_should_HandleReversedPin);
+    RUN_TEST(test_ReadPort_should_ShowProperlyReversedPolarities);
     return UNITY_END();
 }
