@@ -237,7 +237,7 @@ void test_Parser_AddChar_should_BackToStart_when_ReceiveInvalidDataCharacter(voi
 }
 
 
-void test_Parser_AddChar_should_BackToLookForCommand_when_ReceiveLeftBracket(void)
+void test_Parser_AddChar_should_BackToLookForCommand_and_ReturnValidPacket_when_ReceiveLeftBracket(void)
 {
     m_parser_state = PARSER_LOOKING_FOR_START;
     TEST_ASSERT_NULL(Parser_AddChar('['));
@@ -263,6 +263,31 @@ void test_Parser_AddChar_should_BackToLookForCommand_when_ReceiveLeftBracket(voi
     TEST_ASSERT_EQUAL(PARSER_LOOKING_FOR_END, m_parser_state);
     TEST_ASSERT_NULL(Parser_AddChar('['));
     TEST_ASSERT_EQUAL(PARSER_LOOKING_FOR_CMD, m_parser_state);
+
+    m_parser_state = PARSER_LOOKING_FOR_START;
+    TEST_ASSERT_NULL(Parser_AddChar('['));
+    TEST_ASSERT_NULL(Parser_AddChar('A'));
+    TEST_ASSERT_EQUAL(PARSER_LOOKING_FOR_LEN, m_parser_state);
+    insert_valid_packet('M', '5', "a1a2a3a4a5", sizeof("a1a2a3a4a5"));
+    TEST_ASSERT_EQUAL_STRING("[M5a1a2a3a4a5]", Parser_AddChar(']'));
+
+    m_parser_state = PARSER_LOOKING_FOR_START;
+    TEST_ASSERT_NULL(Parser_AddChar('['));
+    TEST_ASSERT_NULL(Parser_AddChar('Z'));
+    TEST_ASSERT_NULL(Parser_AddChar('1'));
+    TEST_ASSERT_EQUAL(PARSER_LOOKING_FOR_DATA, m_parser_state);
+    insert_valid_packet('M', '5', "a1a2a3a4a5", sizeof("a1a2a3a4a5"));
+    TEST_ASSERT_EQUAL_STRING("[M5a1a2a3a4a5]", Parser_AddChar(']'));
+
+    m_parser_state = PARSER_LOOKING_FOR_START;
+    TEST_ASSERT_NULL(Parser_AddChar('['));
+    TEST_ASSERT_NULL(Parser_AddChar('M'));
+    TEST_ASSERT_NULL(Parser_AddChar('1'));
+    TEST_ASSERT_NULL(Parser_AddChar('0'));
+    TEST_ASSERT_NULL(Parser_AddChar('0'));
+    TEST_ASSERT_EQUAL(PARSER_LOOKING_FOR_END, m_parser_state);
+    insert_valid_packet('M', '5', "a1a2a3a4a5", sizeof("a1a2a3a4a5"));
+    TEST_ASSERT_EQUAL_STRING("[M5a1a2a3a4a5]", Parser_AddChar(']'));
 }
 
 
@@ -311,7 +336,7 @@ int main(void) {
     RUN_TEST(test_Parser_AddChar_should_HandleValidPacketWithArbitraryDataLength);
     RUN_TEST(test_Parser_AddChar_should_BackToStart_when_ReceiveInvalidEndCharacter);
     RUN_TEST(test_Parser_AddChar_should_BackToStart_when_ReceiveInvalidDataCharacter);
-    RUN_TEST(test_Parser_AddChar_should_BackToLookForCommand_when_ReceiveLeftBracket);
+    RUN_TEST(test_Parser_AddChar_should_BackToLookForCommand_and_ReturnValidPacket_when_ReceiveLeftBracket);
     RUN_TEST(test_Parser_AddChar_should_HandleUnpairedNibbles);
     return UNITY_END();
 }
