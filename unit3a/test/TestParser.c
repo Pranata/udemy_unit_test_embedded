@@ -266,6 +266,34 @@ void test_Parser_AddChar_should_BackToLookForCommand_when_ReceiveLeftBracket(voi
 }
 
 
+void test_Parser_AddChar_should_HandleUnpairedNibbles(void)
+{
+    TEST_ASSERT_NULL(Parser_AddChar('['));
+    TEST_ASSERT_NULL(Parser_AddChar('M'));
+    TEST_ASSERT_NULL(Parser_AddChar('1'));
+    TEST_ASSERT_NULL(Parser_AddChar('0'));
+    TEST_ASSERT_NULL(Parser_AddChar(']'));
+    TEST_ASSERT_EQUAL(PARSER_LOOKING_FOR_START, m_parser_state);
+
+    TEST_ASSERT_NULL(Parser_AddChar('['));
+    TEST_ASSERT_NULL(Parser_AddChar('A'));
+    TEST_ASSERT_NULL(Parser_AddChar('2'));
+    TEST_ASSERT_NULL(Parser_AddChar('a'));
+    TEST_ASSERT_NULL(Parser_AddChar('1'));
+    TEST_ASSERT_NULL(Parser_AddChar(']'));
+    TEST_ASSERT_EQUAL(PARSER_LOOKING_FOR_START, m_parser_state);
+
+    TEST_ASSERT_NULL(Parser_AddChar('['));
+    TEST_ASSERT_NULL(Parser_AddChar('A'));
+    TEST_ASSERT_NULL(Parser_AddChar('2'));
+    TEST_ASSERT_NULL(Parser_AddChar('a'));
+    TEST_ASSERT_NULL(Parser_AddChar('1'));
+    TEST_ASSERT_NULL(Parser_AddChar('b'));
+    TEST_ASSERT_NULL(Parser_AddChar(']'));
+    TEST_ASSERT_EQUAL(PARSER_LOOKING_FOR_START, m_parser_state);
+}
+
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_Parser_AddChar_should_StartLookingForCmdOnLeftBracket);
@@ -284,5 +312,6 @@ int main(void) {
     RUN_TEST(test_Parser_AddChar_should_BackToStart_when_ReceiveInvalidEndCharacter);
     RUN_TEST(test_Parser_AddChar_should_BackToStart_when_ReceiveInvalidDataCharacter);
     RUN_TEST(test_Parser_AddChar_should_BackToLookForCommand_when_ReceiveLeftBracket);
+    RUN_TEST(test_Parser_AddChar_should_HandleUnpairedNibbles);
     return UNITY_END();
 }
