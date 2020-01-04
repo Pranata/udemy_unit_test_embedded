@@ -110,7 +110,6 @@ char* Parser_AddChar(char new_char)
             else
             {
                 m_parser_state = PARSER_LOOKING_FOR_START;
-                return NULL;
             }
             break;
 
