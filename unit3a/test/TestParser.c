@@ -88,6 +88,22 @@ void test_Parser_AddChar_should_RejectInvalidLengths(void)
 }
 
 
+void test_Parser_AddChar_should_AcceptValidLengths(void)
+{
+    m_parser_state = PARSER_LOOKING_FOR_LEN;
+    TEST_ASSERT_NULL(Parser_AddChar('1'));
+    TEST_ASSERT_EQUAL(PARSER_LOOKING_FOR_DATA, m_parser_state);
+
+    m_parser_state = PARSER_LOOKING_FOR_LEN;
+    TEST_ASSERT_NULL(Parser_AddChar('9'));
+    TEST_ASSERT_EQUAL(PARSER_LOOKING_FOR_DATA, m_parser_state);
+
+    m_parser_state = PARSER_LOOKING_FOR_LEN;
+    TEST_ASSERT_NULL(Parser_AddChar('5'));
+    TEST_ASSERT_EQUAL(PARSER_LOOKING_FOR_DATA, m_parser_state);
+}
+
+
 void test_Parser_AddChar_should_HandleValidPacketWithNoData(void)
 {
     insert_valid_minimal_packet('A', "[A0]");
@@ -127,6 +143,33 @@ void test_Parser_AddChar_should_IgnoreBadCommandCharacter(void)
 }
 
 
+void test_Parser_AddChar_should_HandleValidPacketsWithOneByteData(void)
+{
+    m_parser_state = PARSER_LOOKING_FOR_START;
+    TEST_ASSERT_NULL(Parser_AddChar('['));
+    TEST_ASSERT_NULL(Parser_AddChar('A'));
+    TEST_ASSERT_NULL(Parser_AddChar('1'));
+    TEST_ASSERT_NULL(Parser_AddChar('0'));
+    TEST_ASSERT_EQUAL(PARSER_LOOKING_FOR_DATA, m_parser_state);
+
+    m_parser_state = PARSER_LOOKING_FOR_START;
+    TEST_ASSERT_NULL(Parser_AddChar('['));
+    TEST_ASSERT_NULL(Parser_AddChar('A'));
+    TEST_ASSERT_NULL(Parser_AddChar('1'));
+    TEST_ASSERT_NULL(Parser_AddChar('0'));
+    TEST_ASSERT_NULL(Parser_AddChar('0'));
+    TEST_ASSERT_EQUAL(PARSER_LOOKING_FOR_END, m_parser_state);
+
+    m_parser_state = PARSER_LOOKING_FOR_START;
+    TEST_ASSERT_NULL(Parser_AddChar('['));
+    TEST_ASSERT_NULL(Parser_AddChar('A'));
+    TEST_ASSERT_NULL(Parser_AddChar('1'));
+    TEST_ASSERT_NULL(Parser_AddChar('0'));
+    TEST_ASSERT_NULL(Parser_AddChar('0'));
+    TEST_ASSERT_EQUAL_STRING("[A100]", Parser_AddChar(']'));
+}
+
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_Parser_AddChar_should_StartLookingForCmdOnLeftBracket);
@@ -135,9 +178,11 @@ int main(void) {
     RUN_TEST(test_Parser_AddChar_should_RejectInvalidCommandChar);
     RUN_TEST(test_Parser_AddChar_should_AcceptALengthOfZero);
     RUN_TEST(test_Parser_AddChar_should_RejectInvalidLengths);
+    RUN_TEST(test_Parser_AddChar_should_AcceptValidLengths);
     RUN_TEST(test_Parser_AddChar_should_HandleValidPacketWithNoData);
     RUN_TEST(test_Parser_AddChar_should_HandleBackToBackValidPackets);
     RUN_TEST(test_Parser_AddChar_should_IgnoreBadStartCharacter);
     RUN_TEST(test_Parser_AddChar_should_IgnoreBadCommandCharacter);
+    RUN_TEST(test_Parser_AddChar_should_HandleValidPacketsWithOneByteData);
     return UNITY_END();
 }
