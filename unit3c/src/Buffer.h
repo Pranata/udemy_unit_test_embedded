@@ -7,5 +7,8 @@
 
 int BufferPut(uint16_t val);
 int BufferGet(uint16_t* p_val);
+bool BufferIsFull(void);
+bool BufferIsEmpty(void);
+void BufferClear(void);
 
 #endif //BUFFER_H
